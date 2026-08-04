@@ -1,29 +1,20 @@
-# Group Anagrams
+# LeetCode #49 — Group Anagrams
 
-**LeetCode Problem:** #49
-**Difficulty:** Medium
-**Data Structure:** HashMap
-**Pattern:** Hashing / Grouping / Anagram
-**Language:** Java
+## 📌 Problem
 
----
+Given an array of strings `strs`, group the anagrams together.
 
-## 🧠 Problem in Simple Words
-
-You are given an array of strings.
-
-Your task is to group all strings that are **anagrams** of each other.
-
-Two strings are anagrams if they contain the same characters with the same frequencies, but their order can be different.
+The order of the output does not matter.
 
 ### Example
 
+**Input:**
+
 ```text
-Input:
 ["eat", "tea", "tan", "ate", "nat", "bat"]
 ```
 
-Output:
+**Output:**
 
 ```text
 [
@@ -33,21 +24,21 @@ Output:
 ]
 ```
 
-The order of the groups does not matter.
-
 ---
 
-# 🔍 Understanding the Example
+## 🧠 Problem Understanding
 
-Consider:
+Two strings are anagrams if they contain the same characters with the same frequency, but their order can be different.
+
+For example:
 
 ```text
-"eat"
-"tea"
-"ate"
+eat
+tea
+ate
 ```
 
-All three contain:
+All three strings contain:
 
 ```text
 a → 1
@@ -55,178 +46,101 @@ e → 1
 t → 1
 ```
 
-Therefore, they are anagrams and belong to the same group.
+Therefore, they belong to the same group.
 
 Similarly:
 
 ```text
-"tan"
-"nat"
+tan
+nat
 ```
 
-contain:
-
-```text
-a → 1
-n → 1
-t → 1
-```
-
-So they belong to another group.
-
-Finally:
-
-```text
-"bat"
-```
-
-has a different character composition, so it forms its own group.
+are anagrams and belong to another group.
 
 ---
 
-# 🐢 Brute Force Approach
+## 💡 Key Idea
 
-One possible brute-force approach is to compare every string with other strings and determine whether they are anagrams.
+We need a way to identify anagrams.
 
-We could use the logic from **Valid Anagram #242** to check whether two strings are anagrams.
-
-The general idea would be:
-
-```text
-For every string:
-
-    Compare it with other strings
-
-    If two strings are anagrams:
-        Put them in the same group
-```
-
-The problem is that we may need to compare many pairs of strings.
-
-If there are `n` strings and each string has length `k`, repeatedly checking anagrams becomes expensive.
-
----
-
-# 🚀 Optimized Approach — Sorting as a Key
-
-The key observation is:
-
-> Anagrams produce the same sorted string.
+If we sort the characters of every string, all anagrams will produce the same sorted string.
 
 For example:
 
 ```text
-"eat" → "aet"
-"tea" → "aet"
-"ate" → "aet"
+eat → aet
+tea → aet
+ate → aet
+
+tan → ant
+nat → ant
+
+bat → abt
 ```
 
-Therefore, all three strings can use:
+Therefore, the sorted string can be used as a unique key.
+
+We can use a `HashMap` where:
 
 ```text
-"aet"
+Key   → Sorted version of the string
+Value → List of original strings
 ```
 
-as the same HashMap key.
-
-Similarly:
-
-```text
-"tan" → "ant"
-"nat" → "ant"
-```
-
-Both use:
-
-```text
-"ant"
-```
-
-as their key.
-
-And:
-
-```text
-"bat" → "abt"
-```
-
-uses:
-
-```text
-"abt"
-```
-
-as its key.
-
-So we can use:
-
-```text
-Sorted String → List of Original Strings
-```
-
-For example:
+The map will look conceptually like:
 
 ```text
 "aet" → ["eat", "tea", "ate"]
-
 "ant" → ["tan", "nat"]
-
 "abt" → ["bat"]
 ```
 
 ---
 
-# 🧠 Key Idea
+## 🔑 Data Structure
 
-For every string:
-
-```text
-Original String
-       ↓
-Convert to character array
-       ↓
-Sort characters
-       ↓
-Create sorted string
-       ↓
-Use sorted string as HashMap key
-       ↓
-Add original string to its group
+```java
+HashMap<String, List<String>>
 ```
 
-The important point is:
+### Why?
 
-> We use the **sorted version** as the key, but we store the **original string** in the group.
+We need to map one key to multiple strings.
 
 For example:
 
 ```text
-Original:
-"tea"
-
-Sorted:
 "aet"
+  ↓
+["eat", "tea", "ate"]
 ```
 
-We use:
+Therefore:
 
 ```text
-"aet"
+String
+   ↓
+List<String>
 ```
 
-as the key.
-
-But we store:
-
-```text
-"tea"
-```
-
-in the result.
+is stored in the HashMap.
 
 ---
 
-# 🗺️ Example Dry Run
+## 📝 Algorithm
+
+1. Create a `HashMap<String, List<String>>`.
+2. Iterate through every string in the input array.
+3. Convert the current string into a character array.
+4. Sort the character array.
+5. Convert the sorted character array back into a `String`.
+6. Use the sorted string as the HashMap key.
+7. Add the original string to the list associated with that key.
+8. Return all the values from the HashMap.
+
+---
+
+## 🔍 Example Walkthrough
 
 Input:
 
@@ -234,154 +148,100 @@ Input:
 ["eat", "tea", "tan", "ate", "nat", "bat"]
 ```
 
-Initially:
+### Step 1
+
+Process `"eat"`:
 
 ```text
-Map = {}
-```
-
-### 1. `"eat"`
-
-Sort:
-
-```text
-"eat" → "aet"
+eat → aet
 ```
 
 Map:
 
 ```text
-"aet" → ["eat"]
+aet → ["eat"]
 ```
 
----
+### Step 2
 
-### 2. `"tea"`
-
-Sort:
+Process `"tea"`:
 
 ```text
-"tea" → "aet"
+tea → aet
 ```
 
-The key already exists.
-
-Add `"tea"`:
+Same key:
 
 ```text
-"aet" → ["eat", "tea"]
+aet → ["eat", "tea"]
 ```
 
----
+### Step 3
 
-### 3. `"tan"`
-
-Sort:
+Process `"tan"`:
 
 ```text
-"tan" → "ant"
+tan → ant
 ```
 
 New key:
 
 ```text
-"ant" → ["tan"]
+aet → ["eat", "tea"]
+ant → ["tan"]
 ```
+
+### Step 4
+
+Process `"ate"`:
+
+```text
+ate → aet
+```
+
+Map:
+
+```text
+aet → ["eat", "tea", "ate"]
+ant → ["tan"]
+```
+
+### Step 5
+
+Process `"nat"`:
+
+```text
+nat → ant
+```
+
+Map:
+
+```text
+aet → ["eat", "tea", "ate"]
+ant → ["tan", "nat"]
+```
+
+### Step 6
+
+Process `"bat"`:
+
+```text
+bat → abt
+```
+
+Final map:
+
+```text
+aet → ["eat", "tea", "ate"]
+ant → ["tan", "nat"]
+abt → ["bat"]
+```
+
+Return the values of the map.
 
 ---
 
-### 4. `"ate"`
-
-Sort:
-
-```text
-"ate" → "aet"
-```
-
-Add to existing group:
-
-```text
-"aet" → ["eat", "tea", "ate"]
-```
-
----
-
-### 5. `"nat"`
-
-Sort:
-
-```text
-"nat" → "ant"
-```
-
-Add to existing group:
-
-```text
-"ant" → ["tan", "nat"]
-```
-
----
-
-### 6. `"bat"`
-
-Sort:
-
-```text
-"bat" → "abt"
-```
-
-New group:
-
-```text
-"abt" → ["bat"]
-```
-
-Final HashMap:
-
-```text
-"aet" → ["eat", "tea", "ate"]
-"ant" → ["tan", "nat"]
-"abt" → ["bat"]
-```
-
-The final answer is the collection of all the values.
-
----
-
-# 💻 Java Implementation
-
-```java
-import java.util.*;
-
-class Solution {
-    public List<List<String>> groupAnagrams(String[] strs) {
-
-        Map<String, List<String>> map = new HashMap<>();
-
-        for (String str : strs) {
-
-            // Convert string to character array
-            char[] chars = str.toCharArray();
-
-            // Sort characters
-            Arrays.sort(chars);
-
-            // Sorted string becomes the key
-            String key = new String(chars);
-
-            // Add original string to corresponding group
-            map.putIfAbsent(key, new ArrayList<>());
-            map.get(key).add(str);
-        }
-
-        return new ArrayList<>(map.values());
-    }
-}
-```
-
----
-
-# 🔑 Important Java Methods
+## 💻 Java Methods Used
 
 ### `toCharArray()`
 
@@ -395,7 +255,7 @@ Example:
 
 ```text
 "eat"
-↓
+ ↓
 ['e', 'a', 't']
 ```
 
@@ -413,13 +273,13 @@ Example:
 
 ```text
 ['e', 'a', 't']
-↓
+ ↓
 ['a', 'e', 't']
 ```
 
 ---
 
-### `new String(chars)`
+### `new String()`
 
 Converts the sorted character array back into a String.
 
@@ -427,311 +287,161 @@ Converts the sorted character array back into a String.
 String key = new String(chars);
 ```
 
-Result:
+Example:
 
 ```text
+['a', 'e', 't']
+ ↓
 "aet"
 ```
 
 ---
 
-### `putIfAbsent()`
+### `computeIfAbsent()`
 
-This is useful when creating a new group.
+This method can be used to create a new list if a key doesn't already exist.
 
-```java
-map.putIfAbsent(key, new ArrayList<>());
-```
-
-Meaning:
-
-> If this key doesn't exist, create an empty list for it.
-
-Example:
+Conceptually:
 
 ```text
-Before:
-{}
+If key exists:
+    Get its existing list
 
-After:
-"aet" → []
+If key doesn't exist:
+    Create a new ArrayList
 ```
 
-If `"aet"` already exists, it does nothing.
+Then the original string can be added to that list.
 
 ---
 
-### `map.get(key).add(str)`
-
-First:
-
-```java
-map.get(key)
-```
-
-gets the list associated with the key.
-
-Then:
-
-```java
-.add(str)
-```
-
-adds the original string to that list.
-
-For example:
-
-```text
-"aet" → ["eat", "tea"]
-```
-
-Adding `"ate"` gives:
-
-```text
-"aet" → ["eat", "tea", "ate"]
-```
-
----
-
-### `map.values()`
-
-Returns all the groups.
-
-Example:
-
-```text
-"aet" → ["eat", "tea", "ate"]
-"ant" → ["tan", "nat"]
-"abt" → ["bat"]
-```
-
-`map.values()` gives:
-
-```text
-[
-    ["eat", "tea", "ate"],
-    ["tan", "nat"],
-    ["bat"]
-]
-```
-
-We convert it to an `ArrayList`:
-
-```java
-new ArrayList<>(map.values())
-```
-
----
-
-# ⏱️ Complexity Analysis
+## ⏱️ Time Complexity
 
 Let:
 
-* `n` = number of strings
-* `k` = maximum length of a string
+* `N` = number of strings
+* `K` = maximum length of a string
 
-For every string, we sort its characters.
+For each string, we sort its characters.
 
 Sorting one string takes:
 
 ```text
-O(k log k)
+O(K log K)
 ```
 
-For `n` strings:
+For `N` strings:
 
 ```text
-O(n × k log k)
+O(N × K log K)
 ```
 
 ### Time Complexity
 
 ```text
-O(n × k log k)
+O(N × K log K)
 ```
 
 ### Space Complexity
 
 ```text
-O(n × k)
+O(N × K)
 ```
 
-The HashMap stores all strings in groups, and the sorted keys also require space.
+The space is used to store the grouped strings and the HashMap.
 
 ---
 
-# 🧠 Pattern Recognition
+## 🔥 Pattern Learned
 
-When you see:
+### Pattern: HashMap + Canonical Representation
 
-> "Group anagrams"
-
-Think:
+The important idea is:
 
 ```text
-Anagrams
-    ↓
-Need same identity
-    ↓
-Create canonical key
-    ↓
-Sort characters
-    ↓
-Use sorted string as HashMap key
-    ↓
-HashMap<String, List<String>>
+Different inputs
+      ↓
+Convert into a common representation
+      ↓
+Use common representation as HashMap key
+      ↓
+Group similar inputs
 ```
 
-The key pattern is:
-
-> **Canonical Representation + HashMap**
-
-Different inputs that are logically equivalent are transformed into the same representation.
-
-Example:
+For this problem:
 
 ```text
-eat → aet
-tea → aet
-ate → aet
+"eat" → "aet"
+"tea" → "aet"
+"ate" → "aet"
 ```
 
 Therefore:
 
 ```text
-aet → same group
+"aet" → ["eat", "tea", "ate"]
 ```
 
 ---
 
-# 🔥 Connection to Valid Anagram #242
+## 🧠 Key Takeaway
 
-This problem directly builds on the previous problem.
+The most important lesson from this problem is:
 
-### Valid Anagram #242
+> When multiple objects need to be grouped based on some property, try to create a common key that represents that property.
 
-Question:
-
-> Are these two strings anagrams?
-
-We learned:
+Here, the sorted string acts as the **canonical representation** of an anagram.
 
 ```text
+Anagrams
+    ↓
 Same characters
-+
-Same frequencies
-=
-Anagram
-```
-
-### Group Anagrams #49
-
-Question:
-
-> Which strings are anagrams of each other?
-
-We use the same concept:
-
-```text
-Same characters
-+
-Same frequencies
-=
-Same Group
-```
-
-The difference is that instead of comparing two strings, we create a **common key** that represents their character composition.
-
----
-
-# 🧠 Key Takeaway
-
-The most important idea from this problem is:
-
-> **When multiple inputs share the same property, try to create a common key that represents that property.**
-
-For anagrams:
-
-```text
-"eat"
-"tea"
-"ate"
-```
-
-All become:
-
-```text
-"aet"
-```
-
-So:
-
-```text
-Sorted String
-      ↓
-HashMap Key
-      ↓
-List of Original Strings
-```
-
-Mental trigger:
-
-> **Group similar things → Find a common key → Use HashMap**
-
----
-
-# 📌 Problem Status
-
-```text
-Problem: Group Anagrams
-LeetCode: #49
-Difficulty: Medium
-
-Pattern:
-Hashing + Canonical Representation
-
-Data Structure:
-HashMap<String, List<String>>
-
-Approach:
-Sort each string → Use sorted string as key
-
-Status:
-🟡 Learning / Implementation
+    ↓
+Sort characters
+    ↓
+Same sorted string
+    ↓
+Use sorted string as HashMap key
 ```
 
 ---
 
-# 🔄 Revision Notes
+## 🔗 Related Problems
 
-This problem should be connected with:
+* LeetCode #1 — Two Sum
+* LeetCode #217 — Contains Duplicate
+* LeetCode #242 — Valid Anagram
 
-```text
-#1   Two Sum
-#217 Contains Duplicate
-#242 Valid Anagram
-#49  Group Anagrams
-```
-
-Together, these problems teach important Hashing patterns:
+These problems help build the foundation for:
 
 ```text
-Two Sum
-    ↓
-HashMap for lookup
-
-Contains Duplicate
-    ↓
-HashSet for seen values
-
-Valid Anagram
-    ↓
+HashMap
+HashSet
 Frequency Counting
-
-Group Anagrams
-    ↓
-Canonical Key + HashMap Grouping
+Canonical Representation
+Grouping
 ```
 
-This is a very important progression in your DSA journey.
+---
 
+## 📈 Difficulty
+
+**Medium**
+
+## 🏷️ Pattern
+
+```text
+HashMap
+Hashing
+Sorting
+Canonical Representation
+Grouping
+```
+
+## 🎯 Status
+
+* [ ] Attempted
+* [ ] Solved Independently
+* [ ] Reattempted
+* [ ] Revised
+* [ ] Mastered
