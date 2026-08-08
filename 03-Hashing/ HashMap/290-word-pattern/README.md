@@ -507,5 +507,5 @@ For Isomorphic Strings:
 Character ↔ Character
 ```
 
-The underlying pattern is the same.
+The underlying pattern is the same..
 
