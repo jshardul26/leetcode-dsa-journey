@@ -197,5 +197,5 @@ We will learn XOR in more detail later.
 
 **Primary Pattern:** HashSet
 
-**Secondary Pattern:** Bit Manipulation / XOR
+**Secondary Pattern:** Bit Manipulation / XOR.
 
