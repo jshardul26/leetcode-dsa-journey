@@ -254,3 +254,6 @@ This allows compression without creating another array.
 - First problem using the **read/write pointer** technique.
 - Introduces **in-place array compression**, a common interview pattern.
 - Good problem to revisit before medium-level array/string questions.
+
+- today i am working on my apptitude
+- 
