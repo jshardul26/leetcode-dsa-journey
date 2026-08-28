@@ -1,5 +1,5 @@
 # 520. Detect Capital
-
+1234
 ## Difficulty
 
 Easy
